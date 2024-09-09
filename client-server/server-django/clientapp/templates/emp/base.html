@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  <title>{% block title %}Lotus Pvt Ltd{% endblock %}</title>
+
+  <script src="{% static 'bootstrap/bootstrap.min.js' %} "></script>
+  <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'font-awesome/all.min.css' %} ">
+  <link rel="stylesheet" href="{% static 'styles/app.css' %}" type="text/css" />
+
+  <style>
+    /* Custom styles for larger text and header */
+    .navbar-brand {
+      font-size: 2.5rem; /* Make the "Lotus Pvt Ltd" brand text larger */
+      font-weight: bold;
+    }
+
+    .navbar-text.h5 {
+      font-size: 2rem; /* Larger page title text */
+      font-weight: bold;
+    }
+
+    #datetime {
+      font-size: 1.5rem; /* Larger date and time */
+    }
+
+    /* Increase profile name and username text size */
+    .offcanvas-body .h4,
+    .offcanvas-body .mb-3 {
+      font-size: 1.75rem;
+    }
+
+    /* Adjust logout/login button size */
+    .btn {
+      font-size: 1.25rem;
+    }
+  </style>
+</head>
+
+<body data-bs-theme="dark">
+
+  <!-- SIDE NAVBAR -->
+  <nav class="navbar bg-body-tertiary sticky-top">
+    <div class="container-fluid">
+      <!-- LEFT SIDE: BRAND -->
+      <a class="navbar-brand" href="/client">Lotus Pvt Ltd</a>
+
+      <!-- CENTER: PAGE TITLE -->
+      <span class="navbar-text mx-auto h5">Technician Work Log</span>
+
+      <!-- RIGHT SIDE: DATE AND TIME -->
+      <span id="datetime" class="navbar-text h6 text-end"></span>
+
+      <!-- TOGGLE DARK MODE - LIGHT MODE -->
+      <button id="themeToggle" class="btn mx-2 fas"></button>
+
+      <!-- RIGHT SIDE: TOGGLER -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+
+        <!-- SIDEBAR - HEADER -->
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Profile Details</h5>
+          <!-- TOGGLE SIDEBAR -->
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-body text-center">
+
+          <!-- SIDEBAR - PROFILE -->
+          <div>
+            <a href="#">
+              {% if request.user.employee.photo %}
+              <img src="{{ request.user.employee.photo.url }}" width="65%" height="65%" class="rounded-circle" alt="Custom Profile Pic">
+              {% else %}
+              <img src="{% static 'default.png' %}" width="65%" height="65%" class="rounded-circle" alt="Default Profile Pic">
+              {% endif %}
+            </a>
+            <p class="mt-3 h4">{{ request.user.first_name }} {{ request.user.last_name }}</p>
+            <p class="mb-3">@{{ request.user.username }}</p>
+          </div>
+
+          <div>
+            <!-- RIGHT SIDE: PROFILE RELATED LINKS -->
+            {% if request.user.is_authenticated %}
+            <a href="{% url 'emp:user_logout' %}" class="btn btn-danger"><i class="fas fa-right-from-bracket"></i> Logout</a>
+            {% else %}
+            <a href="{% url 'emp:employee_selection' %}" class="btn btn-primary"><i class="fas fa-right-to-bracket"></i> Login</a>
+            {% endif %}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid p-5">
+    <div class="container container-fluid">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+  <script src="{% static 'scripts/app.js' %}"></script>
+  <script src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+  <script>
+    // Function to update date and time
+    function updateDateTime() {
+      const now = new Date();
+      const date = now.toLocaleDateString('en-GB'); // dd/mm/yyyy format
+      const time = now.toLocaleTimeString(); // hh:mm:ss format
+      document.getElementById('datetime').textContent = `${date} ${time}`;
+    }
+
+    // Update date and time every second
+    setInterval(updateDateTime, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% extends 'server/base.html' %}
+
+{% block title %}{{user.username}} - {{block.super}}{% endblock %}
+{% load static %}
+{% load session_tags %}
+
+{% block content %}
+
+<!-- @MAIN CONTENT -->
+
+<div class="col-lg-8 mb-5">
+  <h4 class="display-6 text-muted my-0">Welcome to</h4>
+  <h1 class="display-1 my-0">Lotus Pvt Ltd</h1>
+  <p>Your trusted partner in employee management.</p>
+</div>
+
+<section class="container">
+
+  <div class="card" style="width: 18rem;">
+    <div class="display-1 text-center p-3"><i class="fas fa-user-plus"></i></div>
+    <div class="card-body">
+      <h5 class="card-title">Register New Employee</h5>
+      <p class="card-text">Add details and register a new employee</p>
+      <a href="{% url 'emp:register' %}" class="btn btn-lg btn-primary">Start</a>
+    </div>
+  </div>
+
+</section>
+
+{% endblock %}

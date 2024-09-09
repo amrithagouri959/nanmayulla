@@ -1,0 +1,43 @@
+{% extends 'server/base.html' %}
+{% block title %}Login at - {{block.super}}{% endblock %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+<h1 class="display-6">Welcome Admin!</h1>
+<!-- <hr class="my-4 "> -->
+<br>
+
+<!-- AUTHENTICATION ERROR MESSAGE -->
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger" role="alert">
+  {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+
+  <!-- CUSTOM LOGIN FORM -->
+<form method="POST">
+  {% csrf_token %}
+  <!-- { { form|crispy }} -->
+  <div class="container container-fluid">
+    <div class="mb-4">
+      <label class="form-label mb-0">Username</label>
+      <input type="text" class="form-control form-control-lg" placeholder="Username" name="username">
+    </div>
+    <div class="mb-4">
+      <label class="form-label mb-0">Password</label>
+      <input type="password" class="form-control form-control-lg" placeholder="Password" name="password">
+    </div>
+    <div class="mb-4">
+      <input type="submit" class="btn btn-primary mb-2" name="submit" value="Login">
+    </div>
+    <div class="links">
+      <a href="{% url 'emp:register' %}">No account?</a>
+      <a href="{% url 'emp:register' %}">Sign Up!</a>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

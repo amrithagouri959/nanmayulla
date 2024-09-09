@@ -1,0 +1,27 @@
+#!/bin/bash
+
+PORT=5050
+
+
+set -e # Stop on error
+cd "$(dirname "$0")"
+if [[ -d "venv" ]]; then
+    source ./venv/bin/activate
+else
+    echo "Virtual environment 'venv' directory not found."
+    exit
+fi
+
+
+Y='\033[1;33m'
+B='\033[1;30m'
+BGY='\u001b[43m'
+RST='\033[0;0m'
+LOCAL_IP=$(ip addr show | grep 'inet ' | awk '{print $2}' | cut -d/ -f1 | grep -v '127.0.0.1' | head -n 1)
+echo -e "LAN Server starting at: ${Y}${BGY}${B} ${LOCAL_IP}:${PORT} ${RST}${Y}${RST}\n"
+
+
+python manage.py runserver 0.0.0.0:$PORT
+# Test Run
+# python manage.py runserver &
+# xdg-open http://localhost:8000

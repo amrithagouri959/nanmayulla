@@ -1,0 +1,18 @@
+{% extends 'emp/base.html' %}
+{% block title %}Register at - {{block.super}}{% endblock %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h1 class="display-5">Create a new account!</h1>
+<!-- <hr class="my-4"> -->
+<br>
+<form enctype="multipart/form-data" method="POST">
+  {% csrf_token %}
+  {% crispy form %}
+  <!-- <input type="submit" name="submit" class="btn btn-primary mb-2" value="Register"> -->
+  <!-- <input type="reset" name="reset" class="btn btn-secondary mb-2" value="Reset"> -->
+  <br>
+  <a href="{% url 'emp:user_login' %}">Or Log into an existing account!</a>
+</form>
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'emp/base.html' %}
+{% block title %}Welcome to {{block.super}}{% endblock %}
+{% load static %}
+
+{% block content %}
+<style>
+body {
+  background-image:url("https://images.pexels.com/photos/273209/pexels-photo-273209.jpeg?auto=compress&cs=tinysrgb&w=600");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+</style>
+
+  <!-- @MAIN CONTENT -->
+<body onclick="window.location.href='{% url 'emp:dashboard' %}'" style="cursor: pointer;">
+  <div class="container-fluid d-flex align-items-center bg-body-tertiary border rounded-4" style="height:80vh;">
+
+    <div class="col-md-8 p-5">
+      <h4 class="display-6 text-muted my-0">Welcome to</h4>
+      <h1 class="display-1 my-0">Lotus Pvt Ltd</h1>
+      <p>Please log in using the official credentials provided by the company to continue recording your working hours. This ensures that your time is accurately tracked and properly accounted for in the system.</p>
+      <div class="d-flex gap-3 justify-content-start mt-4">
+        <a href="{% url 'emp:dashboard' %}" class="btn btn-primary">Show Dashboard</a>
+      </div>
+    </div>
+
+  </div>
+</body>
+
+  {% endblock %}

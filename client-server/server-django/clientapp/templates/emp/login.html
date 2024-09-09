@@ -1,0 +1,94 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <title>{% block title %}Lotus Pvt Ltd{% endblock %}</title>
+
+    <script src="{% static 'bootstrap/bootstrap.min.js' %} "></script>
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %} ">
+    <link rel="stylesheet" href="{% static 'font-awesome/all.min.css' %} ">
+    <link rel="stylesheet" href="{% static 'styles/app.css' %}" type="text/css" />
+  </head>
+
+  <body data-bs-theme="dark" class="text-white">
+
+    <section class="hero-section position-relative d-flex justify-content-center align-items-center">
+      <!-- Background Video -->
+      <video autoplay muted loop class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover">
+        <source src="{% static 'bgvideo.mp4' %}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+
+      <!-- Overlay Dark Filter -->
+      <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark" style="opacity:80%;"></div>
+
+      <!-- Hero Content -->
+      <section class="position-relative z-3 d-flex align-items-center container" style="height:100vh;">
+        <div class="col-lg-7 pe-5">
+          <h4 class="display-5 my-0">Welcome to</h4>
+          <h1 class="display-1 text-primary my-0"><strong>Lotus Pvt Ltd</strong></h1>
+          <p>Please log in using the official credentials provided by the company to continue recording your working hours. This ensures that your time is accurately tracked and properly accounted for in the system.</p>
+        </div>
+
+        <!-- CUSTOM LOGIN FORM -->
+        <form method="POST" class="p-4 container container-fluid border rounded-4" style="backdrop-filter: blur(20px);background-color: rgba(50, 50, 60, 0.3);">
+          <h1 class="display-5">Log In!</h1>
+          {% csrf_token %}
+          <!-- { { form|crispy }} -->
+          <div class="">
+            <!-- AUTHENTICATION ERROR MESSAGE -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="text-danger" role="alert">
+              {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="my-4">
+              <label class="form-label mb-0">Username:</label>
+              <input type="text" class="form-control form-control-lg" placeholder="Username" name="username">
+            </div>
+            <div class="my-4">
+              <label class="form-label mb-0">Password:</label>
+              <input type="password" class="form-control form-control-lg" placeholder="Password" name="password">
+            </div>
+            <div class="d-flex justify-content-between">
+              <input type="submit" class="btn btn-lg px-5 btn-primary mb-2" name="submit" value="Login">
+              <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Forgot Password?
+              </button>
+            </div>
+          </div>
+        </form>
+
+      </section>
+    </section>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content bg-white">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-body text-center text-black">
+            Contact Admin
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+
+
+    <script src="{% static 'scripts/app.js' %}"></script>
+    <script src="{% static 'bootstrap/bootstrap.min.js' %}"></script>
+  </body>
+</html>

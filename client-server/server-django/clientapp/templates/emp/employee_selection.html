@@ -1,0 +1,194 @@
+<!-- Combined Employee Profile Selection and Password Login with Virtual Keyboard -->
+{% extends 'emp/base.html' %}
+{% load static %}
+{% block title %}Select Employee - {{ block.super }}{% endblock %}
+
+{% block content %}
+<style>
+    .employee-card {
+        width: 150px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        background-color: #27ae60;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .employee-card h5 {
+        margin-top: 10px;
+        color: white;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .employee-card img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid white;
+        cursor: pointer;
+    }
+
+    .row.justify-content-center {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    /* Virtual keyboard container styling */
+    #keyboard-container {
+        margin-top: 20px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    .virtual-keyboard button {
+        width: 30px;
+        height: 30px;
+        margin: 2px;
+        font-size: 12px;
+        background-color: #f8f9fa;
+        color: #333;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .virtual-keyboard button:hover {
+        background-color: #dee2e6;
+        transform: scale(1.1);
+    }
+
+    .virtual-keyboard button:active {
+        background-color: #adb5bd;
+    }
+
+    #passwordModal .form-control {
+        border-radius: 20px;
+        text-align: center;
+    }
+
+    #passwordModal .modal-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4"></h2>
+    <div class="row justify-content-center">
+        {% for employee in employees %}
+        <div class="col-md-2 col-sm-4 text-center mb-4 employee-card">
+            <h5>{{ employee.user.first_name }} {{ employee.user.last_name }}</h5>
+            {% if employee.photo %}
+            <img src="{{ employee.photo.url }}" alt="{{ employee.name }}" data-bs-toggle="modal" data-bs-target="#passwordModal" onclick="setEmployee('{{ employee.user.username }}')">
+            {% else %}
+            <img src="{% static 'default_profile.png' %}" alt="{{ employee.name }}" data-bs-toggle="modal" data-bs-target="#passwordModal" onclick="setEmployee('{{ employee.user.username }}')">
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Password Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="passwordModalLabel">Log In</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'emp:employee_selection' %}" id="loginForm">
+                {% csrf_token %}
+                <input type="hidden" id="username" name="username"> <!-- Hidden input to store username -->
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password">
+                    </div>
+                    <div id="keyboard-container" class="virtual-keyboard"></div> <!-- Container for the virtual keyboard -->
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="text-danger" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Virtual Keyboard JavaScript -->
+<script>
+    let currentInput = "password"; // Default focus on password
+
+    // Create virtual keyboard layout
+    function createKeyboard() {
+        const keyboardContainer = document.getElementById('keyboard-container');
+        const keys = [
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+        'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+        'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
+        'Z', 'X', 'C', 'V', 'B', 'N', 'M',
+        'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+        'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+        'z', 'x', 'c', 'v', 'b', 'n', 'm',
+        '!', '@', '#', '$', '%', '^', '&', '*', '(', ')',
+        '-', '=', '+', '[', ']', '{', '}', '\\', ';',
+        ':', "'", ',', '.', '/', 'Backspace', 'Space'
+        ];
+
+        keys.forEach(key => {
+            const button = document.createElement('button');
+            button.textContent = key === 'Space' ? '␣' : key;
+            button.onclick = (event) => {
+                event.preventDefault(); // Prevent default action
+                handleKeyPress(key);
+            };
+            keyboardContainer.appendChild(button);
+        });
+    }
+
+    // Handle key press from virtual keyboard
+    function handleKeyPress(key) {
+        const inputElement = document.getElementById(currentInput);
+
+        if (key === 'Backspace') {
+            inputElement.value = inputElement.value.slice(0, -1); // Remove the last character
+        } else if (key === 'Space') {
+            inputElement.value += ' '; // Add space
+        } else {
+            inputElement.value += key; // Add the character
+        }
+
+        // Keep focus on the input field
+        inputElement.focus();
+        inputElement.selectionStart = inputElement.selectionEnd = inputElement.value.length; // Keep cursor at end
+    }
+
+    // Set the employee username and focus on password input
+    function setEmployee(username) {
+        document.getElementById('username').value = username; // Set the hidden username field
+        currentInput = "password"; // Focus on password after employee selection
+        document.getElementById('password').focus(); // Set focus on password input
+    }
+
+    // Initialize the virtual keyboard on DOM load
+    document.addEventListener('DOMContentLoaded', function () {
+        createKeyboard();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'emp/base.html' %}
+
+{% block title %}{{user.username}} - {{block.super}}{% endblock %}
+{% load static %}
+{% load session_tags %}
+
+{% block content %}
+
+<!-- @MAIN CONTENT -->
+
+<h1 class="display-6 mb-4">Work Session</h1>
+
+{% if latest_session %}
+  {% if not latest_session.end_time %}
+    <!-- If there is an ongoing session -->
+    <div class="row mb-2">
+      <input placeholder="{{ latest_session.description }}" class="col form-control form-control-lg me-2" disabled>
+      {% if latest_session.paused %}
+        <!-- If session is paused -->
+        <form action="{% url 'emp:resume_work' latest_session.id %}" method="post" class="col-auto">
+          {% csrf_token %}
+          <button class="btn btn-lg btn-success" type="submit"><i class="fas fa-play me-2"></i> Resume Work</button>
+        </form>
+      {% else %}
+        <!-- If session is active -->
+        <form action="{% url 'emp:pause_work' latest_session.id %}" method="post" class="col-auto">
+          {% csrf_token %}
+          <button class="btn btn-lg btn-warning" type="submit"><i class="fas fa-pause me-2"></i> Pause Work</button>
+        </form>
+        <form action="{% url 'emp:end_work' latest_session.id %}" method="post" class="col-auto">
+          {% csrf_token %}
+          <button class="btn btn-lg btn-danger" type="submit"><i class="fas fa-stop me-2"></i> End Work</button>
+        </form>
+      {% endif %}
+    </div>
+  {% else %}
+    <!-- If the latest session is ended -->
+    <form action="{% url 'emp:start_work' %}" method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-sm-2">
+          <input type="number" id="machine_input" name="machine" placeholder="Machine No." class="form-control form-control-lg me-2">
+        </div>
+        <input type="text" name="description" placeholder="Enter description" class="col form-control form-control-lg me-2">
+        <button class="col-auto btn btn-lg btn-primary" type="submit"><i class="fas fa-play me-2"></i> Start Work</button>
+      </div>
+    </form>
+  {% endif %}
+{% else %}
+  <!-- If no previous sessions (new user) -->
+  <form action="{% url 'emp:start_work' %}" method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-sm-2">
+        <input type="number" id="machine_input" name="machine" placeholder="Machine No." class="form-control form-control-lg me-2">
+      </div>
+      <input type="text" name="description" placeholder="Enter description" class="col form-control form-control-lg me-2">
+      <button class="col-auto btn btn-primary" type="submit"><i class="fas fa-play me-2"></i> Start Work</button>
+    </div>
+  </form>
+{% endif %}
+
+<hr class="my-4 py-4"/>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Time</th>
+      <th scope="col">Duration</th>
+      <th scope="col">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for day, day_sessions in sessions_grouped_by_day.items %}
+    <tr>
+      <td colspan="4">
+        <strong class="{% if day < today %}h4{% else %}h3{% endif %}"><i class="me-3 mt-4 fas fa-calendar-days"></i>{{ day }}</strong>
+        {% if day < today %}
+        <button class="btn btn-link show-more-btn" data-day="{{ day }}" style="font-size: 12px;">Show More</button>
+        {% endif %}
+      </td>
+    </tr>
+
+    <!-- COLLAPSIBLE SESSIONS -->
+    {% for session in day_sessions %}
+    <tr scope="row" class="session-row {% if day < today %}collapse{% endif %}" data-day="{{ day }}">
+      <td>{{ session.start_time | time:"h:i A" }} - {{ session.end_time | time:"h:i A" }}</td>
+      <td>{{ session.duration | format_duration }}</td>
+      <td>
+        {% if day == today %}
+        <form method="post" action="{% url 'emp:update_session_description' session.id %}">
+          {% csrf_token %}
+          <div class="row">
+            <input
+              type="text"
+              name="description"
+              {% if not session.description == "None" %}
+              value="{{ session.description }}"
+              {% endif %}
+              placeholder="Add a description"
+              class="col form-control form-control-sm"
+            >
+            <button type="submit" class="col-auto btn btn-sm btn-outline-info mt-1">Update</button>
+          </div>
+        </form>
+        {% else %}
+        {{ session.description }}
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- COLLAPSE CLASS -->
+
+<script>
+document.querySelectorAll('.show-more-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const day = button.getAttribute('data-day');
+    const rows = document.querySelectorAll(`.session-row[data-day="${day}"]`);
+    rows.forEach(row => row.classList.toggle('collapse'));
+    button.textContent = button.textContent === 'Show More' ? 'Show Less' : 'Show More';
+  });
+});
+</script>
+
+<!-- MACHINE NUMBER IN LOCALSTORAGE -->
+
+<script>
+window.onload = function() {
+  var machineInput = document.getElementById("machine_input");
+  var machineNumber = localStorage.getItem("machine");
+  if (!machineNumber) {
+    machineNumber = getCookie("machine");
+  }
+  if (machineNumber) {
+    machineInput.value = machineNumber;
+  }
+}
+document.querySelector("form").onsubmit = function() {
+  var machineInput = document.getElementById("machine_input").value;
+  localStorage.setItem("machine", machineInput);
+}
+function getCookie(name) {
+  var value = `; ${document.cookie}`;
+  var parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+</script>
+
+{% endblock %}
